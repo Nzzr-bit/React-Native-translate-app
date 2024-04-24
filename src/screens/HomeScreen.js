@@ -1,17 +1,22 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
-import { TextInput, TouchableOpacity } from "react-native-gesture-handler";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  TouchableOpacity,
+} from "react-native";
 import { FontAwesome6, Feather } from "@expo/vector-icons";
 import { useCallback, useState, useEffect } from "react";
 import SupportLanguages from "../utils/SupportLanguages";
-
-import axios from "axios";
+import colors from "../utils/colors";
 
 export default function HomeScreen(props) {
   const [enteredText, setEnteredText] = useState("");
   const [resultText, setResultText] = useState("");
   const [languageTo, setLanguageTo] = useState("en-GB");
   const [languageFrom, setLanguageFrom] = useState("ru-RU");
+  const [timeoutId, setTimeoutId] = useState(null);
   const params = props.route.params || {};
   useEffect(() => {
     if (params.languageTo) {
@@ -23,13 +28,11 @@ export default function HomeScreen(props) {
     }
   }, [params.languageTo, params.languageFrom]);
 
-  const onSubmit = (translate = () => {
+  const onSubmit = () => {
     if (!enteredText) {
-      setResultText("");
+      setResultText(" ");
       return;
     }
-
-    setResultText("Translating...");
 
     const apiUrl = `https://api.mymemory.translated.net/get?q=
 ${enteredText}&langpair=${languageFrom}|${languageTo}`;
@@ -44,7 +47,17 @@ ${enteredText}&langpair=${languageFrom}|${languageTo}`;
           }
         });
       });
-  });
+  };
+
+  const handleChangeText = (text) => {
+    setEnteredText(text);
+    clearTimeout(timeoutId);
+
+    const id = setTimeout(() => {
+      onSubmit();
+    }, 500);
+    setTimeoutId(id);
+  };
   return (
     <View style={styles.container}>
       <View style={styles.languageContainer}>
@@ -66,7 +79,7 @@ ${enteredText}&langpair=${languageFrom}|${languageTo}`;
           <FontAwesome6
             name="arrow-right-arrow-left"
             size={24}
-            color="#C2C2C2"
+            color={colors.white}
           />
         </View>
 
@@ -90,18 +103,8 @@ ${enteredText}&langpair=${languageFrom}|${languageTo}`;
           multiline
           placeholder="Введите текст"
           style={styles.textInput}
-          onChangeText={(text) => setEnteredText(text)}
+          onChangeText={handleChangeText}
         />
-        <TouchableOpacity
-          onPress={onSubmit}
-          disabled={enteredText === ""}
-          style={styles.iconContainer}>
-          <Feather
-            name="arrow-right-circle"
-            size={28}
-            color={enteredText !== "" ? "#2C6BF2" : "#B3C9FA"}
-          />
-        </TouchableOpacity>
       </View>
 
       <View style={styles.resultContainer}>
@@ -115,8 +118,6 @@ ${enteredText}&langpair=${languageFrom}|${languageTo}`;
           />
         </TouchableOpacity>
       </View>
-
-      <View style={styles.historyContainer}></View>
     </View>
   );
 }
@@ -124,51 +125,59 @@ ${enteredText}&langpair=${languageFrom}|${languageTo}`;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#ffffff",
   },
   languageContainer: {
+    marginTop: 20,
+    paddingBottom: 22,
     flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-around",
-    paddingVertical: 18,
-    borderBottomColor: "#C2C2C2",
-    borderBottomWidth: 1,
+    borderColor: colors.blue,
+    borderWidth: 1,
+    borderTopRightRadius: 25,
+    borderTopLeftRadius: 25,
+    backgroundColor: colors.blue,
   },
   languageOption: {
     flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 20,
   },
   arrowContainer: {
+    width: 50,
     alignItems: "center",
     justifyContent: "center",
   },
   languageOptionText: {
-    color: "#0A369D",
+    color: colors.white,
     letterSpacing: 0.3,
     fontSize: 16,
   },
   inputContainer: {
     flexDirection: "row",
-    borderBottomColor: "#C2C2C2",
-    borderBottomWidth: 1,
+    borderTopRightRadius: 25,
+    borderTopLeftRadius: 25,
+    marginTop: -22,
+    backgroundColor: colors.white,
   },
   textInput: {
     flex: 1,
     paddingHorizontal: 20,
-    paddingBottom: 15,
+    paddingVertical: 15,
     letterSpacing: 0.3,
     height: 90,
     fontSize: 18,
   },
   iconContainer: {
-    flex: 1,
     paddingHorizontal: 10,
     justifyContent: "center",
     alignItems: "center",
   },
   resultContainer: {
     flexDirection: "row",
-    borderBottomColor: "#C2C2C2",
-    borderBottomWidth: 1,
+    borderTopRightRadius: 25,
+    borderTopLeftRadius: 25,
+    backgroundColor: colors.darkBlue,
     height: 90,
   },
   resultText: {
