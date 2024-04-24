@@ -1,8 +1,7 @@
 import { StatusBar } from "expo-status-bar";
 import { useCallback, useEffect } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, FlatList } from "react-native";
 import SupportLanguages from "../utils/SupportLanguages";
-import { FlatList } from "react-native-gesture-handler";
 import LanguageItems from "../components/LanguageItems";
 export default function LanguageSelectScreen({ navigation, route }) {
   const params = route.params || {};

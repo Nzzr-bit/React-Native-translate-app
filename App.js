@@ -1,15 +1,15 @@
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
-import LoginScreen from "./screens/LoginScreen";
-import SaveScreen from "./screens/SaveScreen";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import LoginScreen from "./src/screens/LoginScreen";
+import HistoryScreen from "./src/screens/HistoryScreen";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import HomeScreen from "./screens/HomeScreen";
+import HomeScreen from "./src/screens/HomeScreen";
 import { MaterialIcons, Feather } from "@expo/vector-icons";
-import LanguageSelectScreen from "./screens/languageSelect";
+import LanguageSelectScreen from "./src/screens/languageSelect";
 import "react-native-gesture-handler";
-const Stack = createStackNavigator();
+const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => {
@@ -34,7 +34,7 @@ const TabNavigator = () => {
       />
       <Tab.Screen
         name="Saved"
-        component={SaveScreen}
+        component={HistoryScreen}
         options={{
           tabBarLabel: "Избранное",
           tabBarIcon: (props) => (
@@ -68,7 +68,7 @@ export default function App() {
               name="main"
               component={TabNavigator}
               options={{
-                headerTitle: "Переводчик",
+                headerTitle: "",
               }}></Stack.Screen>
           </Stack.Group>
           <Stack.Group
