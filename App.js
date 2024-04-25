@@ -9,6 +9,9 @@ import HomeScreen from "./src/screens/HomeScreen";
 import { MaterialIcons, Feather } from "@expo/vector-icons";
 import LanguageSelectScreen from "./src/screens/languageSelect";
 import "react-native-gesture-handler";
+import colors from "./src/utils/colors";
+import { Provider } from "react-redux";
+import store from "./src/store/store";
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -33,16 +36,12 @@ const TabNavigator = () => {
         }}
       />
       <Tab.Screen
-        name="Saved"
+        name="History"
         component={HistoryScreen}
         options={{
-          tabBarLabel: "Избранное",
+          tabBarLabel: "История",
           tabBarIcon: (props) => (
-            <MaterialIcons
-              name="favorite-border"
-              size={props.size}
-              color={props.color}
-            />
+            <Feather name="clock" size={props.size} color={props.color} />
           ),
         }}
       />
@@ -52,43 +51,50 @@ const TabNavigator = () => {
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <View style={{ flex: 1 }}>
-        <Stack.Navigator>
-          <Stack.Group>
-            <Stack.Screen
-              name="Login"
-              component={LoginScreen}
-              options={{
-                headerTitle: "Вход",
-              }}></Stack.Screen>
-          </Stack.Group>
-          <Stack.Group>
-            <Stack.Screen
-              name="main"
-              component={TabNavigator}
-              options={{
-                headerTitle: "",
-              }}></Stack.Screen>
-          </Stack.Group>
-          <Stack.Group
-            screenOptions={{
-              presentation: "modal",
-            }}>
-            <Stack.Screen
-              name="languageSelect"
-              component={LanguageSelectScreen}></Stack.Screen>
-          </Stack.Group>
-        </Stack.Navigator>
-      </View>
-    </NavigationContainer>
+    <Provider store={store}>
+      <NavigationContainer>
+        <View style={{ flex: 1 }}>
+          <Stack.Navigator>
+            <Stack.Group>
+              <Stack.Screen
+                name="Login"
+                component={LoginScreen}
+                options={{
+                  headerTitle: "Вход",
+                  eaderShadowVisible: false,
+                }}></Stack.Screen>
+            </Stack.Group>
+            <Stack.Group>
+              <Stack.Screen
+                name="main"
+                component={TabNavigator}
+                options={{
+                  headerTitle: "",
+                  headerShadowVisible: false,
+                }}></Stack.Screen>
+            </Stack.Group>
+            <Stack.Group
+              screenOptions={{
+                presentation: "modal",
+              }}>
+              <Stack.Screen
+                name="languageSelect"
+                component={LanguageSelectScreen}
+                options={{
+                  headerShadowVisible: false,
+                }}></Stack.Screen>
+            </Stack.Group>
+          </Stack.Navigator>
+        </View>
+      </NavigationContainer>
+    </Provider>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: colors.white,
     alignItems: "center",
     justifyContent: "center",
   },

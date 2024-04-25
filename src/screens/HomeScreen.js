@@ -7,9 +7,13 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { FontAwesome6, Feather } from "@expo/vector-icons";
-import { useCallback, useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import SupportLanguages from "../utils/SupportLanguages";
 import colors from "../utils/colors";
+import * as Speech from "expo-speech";
+import * as Clipboard from "expo-clipboard";
+import { useDispatch } from "react-redux";
+import { addHistoryItem, addSearchToHistory } from "../store/historySlice";
 
 export default function HomeScreen(props) {
   const [enteredText, setEnteredText] = useState("");
@@ -17,6 +21,18 @@ export default function HomeScreen(props) {
   const [languageTo, setLanguageTo] = useState("en-GB");
   const [languageFrom, setLanguageFrom] = useState("ru-RU");
   const [timeoutId, setTimeoutId] = useState(null);
+
+  const dispatch = useDispatch();
+
+  const speakText = () => {
+    const options = {
+      voice: `${languageTo}-SMTf00`,
+      pitch: 1,
+      rate: 0.7,
+    };
+    Speech.speak(resultText, options);
+  };
+
   const params = props.route.params || {};
   useEffect(() => {
     if (params.languageTo) {
@@ -46,18 +62,19 @@ ${enteredText}&langpair=${languageFrom}|${languageTo}`;
             setResultText(data.translation);
           }
         });
+        dispatch(
+          addSearchToHistory({
+            originalText: enteredText,
+            translatedText: data.responseData.translatedText,
+          })
+        );
       });
   };
 
-  const handleChangeText = (text) => {
-    setEnteredText(text);
-    clearTimeout(timeoutId);
+  const copyToClipboard = useCallback(async () => {
+    await Clipboard.setStringAsync(resultText);
+  }, [resultText]);
 
-    const id = setTimeout(() => {
-      onSubmit();
-    }, 500);
-    setTimeoutId(id);
-  };
   return (
     <View style={styles.container}>
       <View style={styles.languageContainer}>
@@ -99,24 +116,56 @@ ${enteredText}&langpair=${languageFrom}|${languageTo}`;
       </View>
 
       <View style={styles.inputContainer}>
-        <TextInput
-          multiline
-          placeholder="Введите текст"
-          style={styles.textInput}
-          onChangeText={handleChangeText}
-        />
+        <View>
+          <TextInput
+            multiline
+            placeholder="Введите текст"
+            style={styles.textInput}
+            onChangeText={(text) => setEnteredText(text)}
+            value={enteredText}
+          />
+        </View>
+        <View style={styles.iconRow}>
+          <TouchableOpacity
+            style={styles.iconContainer}
+            onPress={() => onSubmit()}>
+            <Feather name="arrow-right" size={28} color={colors.black} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.iconContainer}
+            onPress={() => {
+              setEnteredText("");
+              setResultText("");
+            }}>
+            <Feather name="x" size={28} color={colors.black} />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <View style={styles.resultContainer}>
-        <Text style={styles.resultText}>{resultText}</Text>
-        <TouchableOpacity style={styles.iconContainer}>
-          <Feather
-            disabled={resultText === ""}
-            name="copy"
-            size={28}
-            color={resultText !== "" ? "black" : "grey"}
-          />
-        </TouchableOpacity>
+        <View>
+          <Text style={styles.resultText}>{resultText}</Text>
+        </View>
+        <View style={styles.iconRow}>
+          <TouchableOpacity style={styles.iconContainer} onPress={speakText}>
+            <Feather
+              disabled={resultText === ""}
+              name="volume-2"
+              size={28}
+              color={colors.white}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.iconContainer}
+            onPress={copyToClipboard}>
+            <Feather
+              disabled={resultText === ""}
+              name="copy"
+              size={28}
+              color={colors.white}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -154,43 +203,44 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   inputContainer: {
-    flexDirection: "row",
+    flexDirection: "column",
     borderTopRightRadius: 25,
     borderTopLeftRadius: 25,
+    justifyContent: "flex-start",
     marginTop: -22,
     backgroundColor: colors.white,
+    paddingBottom: 20,
   },
   textInput: {
-    flex: 1,
     paddingHorizontal: 20,
     paddingVertical: 15,
-    letterSpacing: 0.3,
-    height: 90,
     fontSize: 18,
+    letterSpacing: 0.3,
+    marginBottom: 10,
   },
+
   iconContainer: {
-    paddingHorizontal: 10,
-    justifyContent: "center",
-    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 6,
   },
   resultContainer: {
-    flexDirection: "row",
+    flexDirection: "column",
     borderTopRightRadius: 25,
     borderTopLeftRadius: 25,
-    backgroundColor: colors.darkBlue,
-    height: 90,
+    backgroundColor: colors.blue,
+    flex: 1,
+    justifyContent: "flex-start",
   },
+
   resultText: {
-    marginTop: 15,
-    flex: 1,
-    fontSize: 18,
     paddingHorizontal: 20,
-    paddingBottom: 15,
+    paddingVertical: 15,
+    fontSize: 18,
     letterSpacing: 0.3,
+    color: colors.white,
   },
-  historyContainer: {
-    backgroundColor: "#F1F3F8",
-    flex: 1,
-    padding: 10,
+  iconRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
 });

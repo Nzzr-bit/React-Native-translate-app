@@ -3,6 +3,7 @@ import { useCallback, useEffect } from "react";
 import { StyleSheet, Text, View, FlatList } from "react-native";
 import SupportLanguages from "../utils/SupportLanguages";
 import LanguageItems from "../components/LanguageItems";
+import colors from "../utils/colors";
 export default function LanguageSelectScreen({ navigation, route }) {
   const params = route.params || {};
   const { title, selected } = params;
@@ -43,6 +44,9 @@ export default function LanguageSelectScreen({ navigation, route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: colors.blue,
+    borderTopRightRadius: 25,
+    borderTopLeftRadius: 25,
+    marginTop: 10,
   },
 });
