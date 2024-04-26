@@ -1,4 +1,5 @@
 import { StatusBar } from "expo-status-bar";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   StyleSheet,
   Text,
@@ -7,20 +8,18 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { FontAwesome6, Feather } from "@expo/vector-icons";
-import { useState, useEffect, useCallback } from "react";
-import SupportLanguages from "../utils/SupportLanguages";
-import colors from "../utils/colors";
 import * as Speech from "expo-speech";
 import * as Clipboard from "expo-clipboard";
 import { useDispatch } from "react-redux";
-import { addHistoryItem, addSearchToHistory } from "../store/historySlice";
+import { addSearchToHistory } from "../store/historySlice";
+import SupportLanguages from "../utils/SupportLanguages";
+import colors from "../utils/colors";
 
 export default function HomeScreen(props) {
   const [enteredText, setEnteredText] = useState("");
   const [resultText, setResultText] = useState("");
   const [languageTo, setLanguageTo] = useState("en-GB");
   const [languageFrom, setLanguageFrom] = useState("ru-RU");
-  const [timeoutId, setTimeoutId] = useState(null);
 
   const dispatch = useDispatch();
 
@@ -123,6 +122,7 @@ ${enteredText}&langpair=${languageFrom}|${languageTo}`;
             style={styles.textInput}
             onChangeText={(text) => setEnteredText(text)}
             value={enteredText}
+            numberOfLines={4}
           />
         </View>
         <View style={styles.iconRow}>
@@ -144,7 +144,9 @@ ${enteredText}&langpair=${languageFrom}|${languageTo}`;
 
       <View style={styles.resultContainer}>
         <View>
-          <Text style={styles.resultText}>{resultText}</Text>
+          <Text style={styles.resultText} numberOfLines={4} multiline>
+            {resultText}
+          </Text>
         </View>
         <View style={styles.iconRow}>
           <TouchableOpacity style={styles.iconContainer} onPress={speakText}>
@@ -217,6 +219,8 @@ const styles = StyleSheet.create({
     fontSize: 18,
     letterSpacing: 0.3,
     marginBottom: 10,
+    maxHeight: 4 * 20 * 2,
+    overflow: "scroll",
   },
 
   iconContainer: {
@@ -238,6 +242,8 @@ const styles = StyleSheet.create({
     fontSize: 18,
     letterSpacing: 0.3,
     color: colors.white,
+    maxHeight: 4 * 20 * 2,
+    overflow: "scroll",
   },
   iconRow: {
     flexDirection: "row",

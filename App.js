@@ -71,6 +71,8 @@ export default function App() {
                 options={{
                   headerTitle: "",
                   headerShadowVisible: false,
+                  headerBackVisible: false,
+                  animation: "slide_from_right",
                 }}></Stack.Screen>
             </Stack.Group>
             <Stack.Group
@@ -82,6 +84,7 @@ export default function App() {
                 component={LanguageSelectScreen}
                 options={{
                   headerShadowVisible: false,
+                  animation: "slide_from_bottom",
                 }}></Stack.Screen>
             </Stack.Group>
           </Stack.Navigator>
